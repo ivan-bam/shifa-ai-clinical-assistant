@@ -1,0 +1,17 @@
+# Core AI / LLM
+langchain==0.3.25
+langchain-openai==0.3.16
+langgraph==0.4.5
+
+# API framework
+fastapi==0.115.12
+uvicorn==0.34.2
+
+# Database (requires PostgreSQL to be installed first)
+psycopg2-binary==2.9.10
+pgvector==0.3.6
+sqlalchemy==2.0.41
+
+# Utilities
+python-dotenv==1.1.0
+pydantic==2.11.4
