@@ -7,8 +7,8 @@ langgraph==0.4.5
 fastapi==0.115.12
 uvicorn==0.34.2
 
-# Database (requires PostgreSQL to be installed first)
-psycopg2-binary==2.9.10
+# Database
+psycopg[binary]==3.2.6
 pgvector==0.3.6
 sqlalchemy==2.0.41
 
