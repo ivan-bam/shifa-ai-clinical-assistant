@@ -43,16 +43,22 @@ class SuggestionsGenerationResult(BaseModel):
     ai_generated: bool = True
 
 
-def generate_clinical_suggestions(physician_input: str) -> SuggestionsGenerationResult:
+def generate_clinical_suggestions(
+    physician_input: str,
+    context: str = "",
+) -> SuggestionsGenerationResult:
     llm = get_llm()
     structured_llm = llm.with_structured_output(ClinicalSuggestions)
 
-    suggestions: ClinicalSuggestions = structured_llm.invoke(
-        [
-            ("system", SUGGESTIONS_SYSTEM_PROMPT),
-            ("user", physician_input),
-        ]
-    )
+    messages = [("system", SUGGESTIONS_SYSTEM_PROMPT)]
+    if context:
+        messages.append((
+            "system",
+            f"Relevant clinical reference material retrieved from the knowledge base:\n\n{context}",
+        ))
+    messages.append(("user", physician_input))
+
+    suggestions: ClinicalSuggestions = structured_llm.invoke(messages)
 
     return SuggestionsGenerationResult(
         suggestions=suggestions,

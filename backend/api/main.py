@@ -2,7 +2,15 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from backend.api.routes import clinical, health, interactions, llm, soap, suggestions
+from backend.api.routes import (
+    clinical,
+    documents,
+    health,
+    interactions,
+    llm,
+    soap,
+    suggestions,
+)
 from backend.services.db_init import init_database
 
 
@@ -26,3 +34,4 @@ app.include_router(soap.router)
 app.include_router(suggestions.router)
 app.include_router(clinical.router)
 app.include_router(interactions.router)
+app.include_router(documents.router)

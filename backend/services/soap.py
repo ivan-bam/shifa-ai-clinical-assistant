@@ -18,16 +18,19 @@ class SOAPGenerationResult(BaseModel):
     ai_generated: bool = True
 
 
-def generate_soap_note(physician_input: str) -> SOAPGenerationResult:
+def generate_soap_note(physician_input: str, context: str = "") -> SOAPGenerationResult:
     llm = get_llm()
     structured_llm = llm.with_structured_output(SOAPNote)
 
-    note: SOAPNote = structured_llm.invoke(
-        [
-            ("system", SOAP_SYSTEM_PROMPT),
-            ("user", physician_input),
-        ]
-    )
+    messages = [("system", SOAP_SYSTEM_PROMPT)]
+    if context:
+        messages.append((
+            "system",
+            f"Relevant clinical reference material retrieved from the knowledge base:\n\n{context}",
+        ))
+    messages.append(("user", physician_input))
+
+    note: SOAPNote = structured_llm.invoke(messages)
 
     return SOAPGenerationResult(
         note=note,

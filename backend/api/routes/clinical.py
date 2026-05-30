@@ -30,7 +30,7 @@ def run_full_workflow(
     request: ClinicalWorkflowRequest,
     db: Session = Depends(get_db),
 ):
-    output = run_clinical_workflow(request.physician_input)
+    output = run_clinical_workflow(request.physician_input, db=db)
 
     interaction = AIInteraction(
         encounter_id=request.encounter_id,

@@ -1,6 +1,7 @@
 from sqlalchemy import text
 
 from backend.models.ai_interaction import AIInteraction  # noqa: F401 (registers the table)
+from backend.models.embedded_document import EmbeddedDocument  # noqa: F401
 from backend.models.base import Base
 from backend.services.database import engine
 
