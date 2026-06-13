@@ -65,6 +65,10 @@ cp .env.example .env          # then add your OPENAI_API_KEY
 docker compose up --build
 ```
 
+> **You must supply your own OpenAI API key** (from platform.openai.com, with a
+> small amount of credit) in `.env` before starting — the app calls the OpenAI
+> API at runtime and will fail without a valid key.
+
 That's it. The API is available at http://localhost:8000 and the interactive
 docs at http://localhost:8000/docs. To stop it: `docker compose down`.
 
@@ -109,6 +113,49 @@ DATABASE_URL=postgresql://postgres:password@localhost:5432/shifa_db
 ```bash
 uvicorn backend.api.main:app --reload
 ```
+
+## Evaluation Suite
+
+An automated quality check for the AI's output. It runs a set of realistic ED
+cases and verifies the responses are well-formed (all SOAP sections present,
+every medication dosed, diagnoses ranked) and clinically relevant (e.g. a chest
+pain case must mention ECG/troponin/aspirin). It exits non-zero on failure, so it
+can gate changes in CI.
+
+```bash
+python -m backend.evaluations.runner
+```
+
+## Logs (Observability)
+
+Every request is logged with a unique ID and its duration, and the clinical
+workflow logs how long generation takes. To follow the logs live:
+
+```bash
+docker compose logs -f app        # when running via Docker
+```
+
+When running locally, the logs print straight to your terminal.
+
+## Design Notes
+
+A few deliberate decisions, documented so they're not mistaken for oversights:
+
+- **Workflow shape.** The spec recommends a graph with separate diagnosis,
+  investigation, medication, and schedule nodes. These are merged into a single
+  `suggestions` node — one LLM call returning all four. This is cheaper (one
+  round-trip instead of four), lower-latency, and keeps the suggestions coherent
+  with each other. The retrieval and SOAP steps remain their own nodes.
+- **Human review is an API step, not a graph node.** Generation and approval are
+  separate endpoints rather than a `human_review` node inside the graph, so the
+  AI run and the clinician's decision are cleanly decoupled and independently
+  auditable.
+- **Empty `agents/` and `governance/` folders** are intentional placeholders that
+  mirror the spec's structure. The governance *rules* are enforced across the app
+  (see below), not isolated in that folder.
+- **Backend-only MVP.** There is no frontend by design — the deliverables are the
+  API, workflow, persistence, and Docker setup. A UI would consume these same
+  endpoints in a later phase.
 
 ## Governance
 
