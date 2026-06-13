@@ -11,6 +11,28 @@ services:
       - "5432:5432"
     volumes:
       - shifa_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d shifa_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: shifa-api
+    restart: unless-stopped
+    # Loads OPENAI_API_KEY and LLM_MODEL from your local .env file.
+    env_file:
+      - .env
+    # Overrides DATABASE_URL so the app reaches the db container by its service
+    # name ("db") on the internal Docker network, not localhost.
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/shifa_db
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   shifa_pgdata:

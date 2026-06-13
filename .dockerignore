@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Secrets — passed in at runtime via docker compose, never baked into the image
+.env
+
+# Local data and tooling
+data/
+.git/
+.gitignore
+.claude/
+.DS_Store
+README.md
+docker-compose.yml
+Dockerfile
+.dockerignore

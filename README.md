@@ -56,6 +56,27 @@ git clone <your-repo-url>
 cd shifa-ai-clinical-assistant
 ```
 
+## Run Everything with Docker (recommended)
+
+The fastest way to run the whole project — database and API together:
+
+```bash
+cp .env.example .env          # then add your OPENAI_API_KEY
+docker compose up --build
+```
+
+That's it. The API is available at http://localhost:8000 and the interactive
+docs at http://localhost:8000/docs. To stop it: `docker compose down`.
+
+> When running this way, the API reaches the database inside Docker, so you do
+> not need PostgreSQL installed on your machine.
+
+## Run Locally Without Docker
+
+Use this if you want to run the API directly (e.g. with auto-reload while coding).
+You still need a PostgreSQL database — the simplest option is to run just the
+database in Docker: `docker compose up -d db`.
+
 ### 2. Create a virtual environment
 
 ```bash

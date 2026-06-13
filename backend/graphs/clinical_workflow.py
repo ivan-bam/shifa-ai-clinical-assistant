@@ -1,15 +1,19 @@
+import time
 from typing import Any, TypedDict
 
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from backend.observability.logging_config import get_logger
 from backend.rag.service import search_documents
 from backend.services.soap import SOAPGenerationResult, generate_soap_note
 from backend.services.suggestions import (
     SuggestionsGenerationResult,
     generate_clinical_suggestions,
 )
+
+logger = get_logger("shifa.workflow")
 
 WORKFLOW_VERSION = "clinical-workflow-v2"
 TOP_K = 5  # how many reference chunks to retrieve
@@ -88,6 +92,9 @@ _workflow = _build_workflow()
 
 
 def run_clinical_workflow(physician_input: str, db: Session) -> ClinicalWorkflowOutput:
+    start = time.perf_counter()
+    logger.info("Clinical workflow started (%s)", WORKFLOW_VERSION)
+
     final_state: ClinicalWorkflowState = _workflow.invoke(
         {
             "physician_input": physician_input,
@@ -97,6 +104,12 @@ def run_clinical_workflow(physician_input: str, db: Session) -> ClinicalWorkflow
             "soap_result": None,
             "suggestions_result": None,
         }
+    )
+
+    elapsed_ms = (time.perf_counter() - start) * 1000
+    logger.info(
+        "Clinical workflow finished in %.0fms (retrieved %d chunks)",
+        elapsed_ms, len(final_state["retrieved_chunks"]),
     )
 
     return ClinicalWorkflowOutput(
