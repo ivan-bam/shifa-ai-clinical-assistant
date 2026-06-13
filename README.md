@@ -14,7 +14,7 @@ An AI-assisted clinical documentation tool for Emergency Department physicians. 
 | Technology | Role |
 |---|---|
 | Python 3.13 | Core programming language |
-| FastAPI | REST API that the frontend talks to |
+| FastAPI | REST API layer that clients and frontends call |
 | LangChain + LangGraph | AI workflow orchestration |
 | OpenAI API | Large language model (GPT-4o) |
 | PostgreSQL + pgvector | Database with AI-powered search |
@@ -35,6 +35,9 @@ shifa-ai-clinical-assistant/
 │   ├── evaluations/     # AI output quality testing
 │   ├── observability/   # Logging and monitoring
 │   └── governance/      # Audit trails and compliance
+├── Dockerfile           # Builds the API container image
+├── docker-compose.yml   # Runs the database and API together
+├── .dockerignore        # Files excluded from the image
 ├── .env.example         # Template for environment variables
 ├── requirements.txt     # Python dependencies
 └── README.md
@@ -166,4 +169,13 @@ A few deliberate decisions, documented so they're not mistaken for oversights:
 
 ## Status
 
-MVP in active development.
+MVP complete. All Phase 1 deliverables are implemented:
+
+- Structured SOAP note generation
+- Clinical suggestions (diagnoses, investigations, medications, care schedule)
+- LangGraph workflow with RAG retrieval over uploaded guidelines (pgvector)
+- Physician review and approval workflow
+- PostgreSQL persistence with full audit logging
+- Request logging / observability
+- Automated evaluation suite
+- Fully Dockerised (one-command run)
